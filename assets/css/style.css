@@ -4,4 +4,79 @@
     --light-blue: #8ECAE6;
     --orange: #FB8500;
     --yellow: #FFB703;
+    --montserrat: 'Montserrat', sans-serif;
+    --open-sans: 'Open Sans', sans-serif;
 }
+/* Global Styles */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--montserrat);
+}
+
+p, a, span, li, input, textarea, button {
+    font-family: var(--open-sans);
+}
+
+body{
+    background-color: var(--light-blue);
+}
+
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Header Styles */
+header{
+    display: flex;
+    align-items: center ;
+    justify-content: space-between;
+    background-color: var(--dark-blue);
+    color: white;
+    padding: 10px;
+    border-bottom: 2px solid var(--yellow);
+}
+
+@media (max-width: 768px){
+    header{
+        position: fixed;
+        top: 0;
+        min-width: 100vw;
+        z-index: 1;
+        padding: 1rem;
+    }
+    header h1 {
+        font-size: 1.25rem;
+        max-width: 50%;
+        padding: 0;
+    }
+    
+}
+
+footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 2px solid var(--yellow);
+    background-color: var(--dark-blue);
+    color: white;
+    padding: 10px;
+    margin-top: auto;
+}
+
+footer p{
+    color: var(--yellow);
+    font-family: var(--montserrat);
+}
+
+
+
+
+

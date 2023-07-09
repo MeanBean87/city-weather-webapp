@@ -9,27 +9,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
     <link rel="icon" href="./assets/images/favicon.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/reset.css">
     <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
 <body>
     <header>
-        <nav>
-            <h1></h1>
-            <ul>
-                <li><a href="#">Search</a></li>
-                <li><a href="#">Contact us</a></li>
-            </ul>
-        </nav>
+        <h1>Chill Billy Weather</h1>
     </header>
-
-    <main>
-
+    <main class="container">
+        <aside class="col-4 city-search">
+            <form action="index.php" method="post">
+                <label for="city">City</label>
+                <input type="text" name="city" id="city" placeholder="City Name" required>
+                <label for="state">State</label>
+                <input type="text" name="state" id="state" placeholder="State Abbreviation" required>
+                <input type="submit" value="Submit">
+            </form>
+        </aside>
+        <section class="weather container">
+            <section class="col-12 current-weather">
+                <h2 class="city-name">Louisville</h2>
+            </section>
+            <section class="col-12 five-day-forecast">
+                <h3>5-Day Forecast:</h3>
+            </section>
+        </section>
     </main>
-   
     <footer id="Contact">
-
+        <p>Created by Michael Mattingly<p>
     </footer>
     <script src="./assets/js/script.js" async defer></script>
 </body>
