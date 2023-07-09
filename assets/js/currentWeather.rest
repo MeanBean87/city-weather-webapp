@@ -1,0 +1,1 @@
+GET https://api.openweathermap.org/data/2.5/weather?q=Louisville,KY,US&appid=c3a67a6baa2b74fa79ed801bde2fc0a9&units=imperial

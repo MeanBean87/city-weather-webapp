@@ -154,60 +154,93 @@ const cities = [
   "New Orleans",
 ];
 
+let currentWeatherObj = {};
+let fiveDayForecastObj = {};
+
 function getCurrentWeather(cityName, stateName) {
-  $.ajax({
-    url: `${window.CURRENT_DAY_API_URL}?q=${cityName},${stateName}&appid=${window.API_KEY}&units=imperial`,
-    method: "GET",
-    dataType: "json",
-  })
+	return $.ajax({
+	  url: `${window.CURRENT_DAY_API_URL}?q=${cityName},${stateName}&appid=${window.API_KEY}&units=imperial`,
+	  method: "GET",
+	  dataType: "json",
+	});
+  }
 
-    .done(function (currentWeatherObj) {
-      console.log(currentWeatherObj);
-      return currentWeatherObj;
-    })
-
-    .fail(function (jqXHR, textStatus, error) {
-      console.log("Error: " + error);
-    });
-}
-
-function getFiveDayForecast(cityName, stateName) {
-  $.ajax({
-    url: `${window.FIVE_DAY_API_URL}?q=${cityName},${stateName}&appid=${window.API_KEY}&units=imperial`,
-    method: "GET",
-    dataType: "json",
-  })
-
-    .done(function (fiveDayForecastObj) {
-      console.log(fiveDayForecastObj);
-      return fiveDayForecastObj;
-    })
-
-    .fail(function (jqXHR, textStatus, error) {
-      console.log("Error: " + error);
-    });
-}
+  function getFiveDayForecast(cityName, stateName) {
+	return $.ajax({
+	  url: `${window.FIVE_DAY_API_URL}?q=${cityName},${stateName}&appid=${window.API_KEY}&units=imperial`,
+	  method: "GET",
+	  dataType: "json",
+	});
+  }
 
 function updateLocalStorage(cityName, stateName) {
-  let tempStorage = JSON.parse(localStorage.getItem("locations")) || [];
-
-  let locationExists = tempStorage.some(function () {
-    return location.city === cityName && location.state === stateName;
-  });
-
-  if (!locationExists) {
-    tempStorage.push({ city: cityName, state: stateName });
-    localStorage.setItem("locations", JSON.stringify(tempStorage));
-    renderContent(cityName, stateName);
-  } else {
-    renderContent(cityName, stateName);
+	let tempStorage = JSON.parse(localStorage.getItem("locations"));
+  
+	if (!Array.isArray(tempStorage)) {
+	  tempStorage = [];
+	}
+  
+	let locationExists = false;
+  
+	for (const location of tempStorage) {
+	  if (location.city === cityName && location.state === stateName) {
+		locationExists = true;
+		break;
+	  }
+	}
+  
+	if (!locationExists) {
+	  tempStorage.push({ city: cityName, state: stateName });
+	  localStorage.setItem("locations", JSON.stringify(tempStorage));
+	  renderContent(cityName, stateName);
+	} else {
+	  renderContent(cityName, stateName);
+	}
   }
-}
 
-function renderContent(cityName, stateName) {
-  updateLocalStorage(cityName, stateName);
-  let currentWeatherObj = getCurrentWeather(cityName, stateName);
-  let fiveDayForecastObj = getFiveDayForecast(cityName, stateName);
+  function renderContent(cityName, stateName) {
+	getCurrentWeather(cityName, stateName)
+	  .done(function (currentWeatherObj) {
+		getFiveDayForecast(cityName, stateName)
+		  .done(function (fiveDayForecastObj) {
+			createElements(currentWeatherObj, fiveDayForecastObj);
+		  })
+		  .fail(function (jqXHR, textStatus, error) {
+			console.log("Error: " + error);
+		  });
+	  })
+	  .fail(function (jqXHR, textStatus, error) {
+		console.log("Error: " + error);
+	  });
+  }
+
+function createElements(currentWeatherObj, fiveDayForecastObj) {
+  $(".current-weather").append(
+    `<h2>${currentWeatherObj.name} ${dayjs.unix(currentWeatherObj.dt).format("MM/DD/YYYY")}</h2>
+		<img src="${`http://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img>
+		<p>Temperature: ${currentWeatherObj.main.temp}°F</p>
+		<p>Wind: ${currentWeatherObj.wind.speed}MPH</p>
+		<p>Humidity: ${currentWeatherObj.main.humidity}%</p>`
+  );
+
+	let storedIndexes = [];
+	
+	for (let i = 0; i < fiveDayForecastObj.list.length; i++) {
+		if (fiveDayForecastObj.list[i].dt_txt.includes("12:00:00")) {
+			storedIndexes.push(i);
+		}
+	}
+	
+  for (let i = 0; i < storedIndexes.length; i++) {
+    $(".five-day-forecast").append(
+      `<card id="day-${[i]}">
+		  <h3>${dayjs.unix(fiveDayForecastObj.list[storedIndexes[i]].dt).format("MM/DD/YYYY")}</h3>
+		  <img src="${`http://openweathermap.org/img/wn/${fiveDayForecastObj.list[storedIndexes[i]].weather[0].icon}@2x.png`}"></img>
+		  <p>Temperature: ${fiveDayForecastObj.list[storedIndexes[i]].main.temp}°F</p>
+		  <p>Wind: ${fiveDayForecastObj.list[storedIndexes[i]].wind.speed}MPH</p>
+		  <p>Humidity: ${fiveDayForecastObj.list[storedIndexes[i]].main.humidity}%</p>`
+    );
+  }
 }
 
 $(document).ready(function () {
@@ -219,7 +252,7 @@ $(document).ready(function () {
     const stateName =
       $("#state-name").val().charAt(0).toUpperCase() +
       $("#state-name").val().slice(1);
-	renderContent(cityName, stateName);
+	updateLocalStorage(cityName, stateName);
   });
 
   $("#city-name").autocomplete({
@@ -229,4 +262,6 @@ $(document).ready(function () {
   $("#state-name").autocomplete({
     source: states,
   });
+
 });
+
