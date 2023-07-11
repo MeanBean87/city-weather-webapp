@@ -1,1 +1,1 @@
-GET https://api.openweathermap.org/data/2.5/forecast?q=Louisville,KY,US&appid=c3a67a6baa2b74fa79ed801bde2fc0a9
+GET https://api.openweathermap.org/data/2.5/forecast?q=api.openweathermap.org/geo/1.0/direct?q=Louisville%20,Kentucky&limit=100&appid=c3a67a6baa2b74fa79ed801bde2fc0a9&appid=c3a67a6baa2b74fa79ed801bde2fc0a9

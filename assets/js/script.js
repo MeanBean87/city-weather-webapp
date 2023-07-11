@@ -1,53 +1,85 @@
 const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Louisville"];
 
+const stateNames = [
+  "Alabama",
+  "Alaska",
+  "Arizona",
+  "Arkansas",
+  "California",
+  "Colorado",
+  "Connecticut",
+  "Delaware",
+  "Florida",
+  "Georgia",
+  "Hawaii",
+  "Idaho",
+  "Illinois",
+  "Indiana",
+  "Iowa",
+  "Kansas",
+  "Kentucky",
+  "Louisiana",
+  "Maine",
+  "Maryland",
+  "Massachusetts",
+  "Michigan",
+  "Minnesota",
+  "Mississippi",
+  "Missouri",
+  "Montana",
+  "Nebraska",
+  "Nevada",
+  "New Hampshire",
+  "New Jersey",
+  "New Mexico",
+  "New York",
+  "North Carolina",
+  "North Dakota",
+  "Ohio",
+  "Oklahoma",
+  "Oregon",
+  "Pennsylvania",
+  "Rhode Island",
+  "South Carolina",
+  "South Dakota",
+  "Tennessee",
+  "Texas",
+  "Utah",
+  "Vermont",
+  "Virginia",
+  "Washington",
+  "West Virginia",
+  "Wisconsin",
+  "Wyoming",
+];
+
 async function getCityInfo(cityName) {
-  return $.ajax({
-    url: `${window.GEOCODING_API_URL}?q=${cityName}&appid=${window.API_KEY}`,
-    method: "GET",
-    dataType: "json",
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    console.log("Error:", textStatus, errorThrown);
-  });
+  return await fetchData(
+    `${window.GEOCODING_API_URL}?q=${encodeURIComponent(cityName)}&limit=20&appid=${window.API_KEY}`
+  );
 }
 
 async function getCurrentWeatherCoordinates(lat, lon) {
-  return $.ajax({
-    url: `${window.CURRENT_DAY_API_URL}?lat=${lat}&lon=${lon}&appid=${window.API_KEY}&units=imperial`,
-    method: "GET",
-    dataType: "json",
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    console.log("Error:", textStatus, errorThrown);
-  });
+  return await fetchData(
+    `${window.CURRENT_DAY_API_URL}?lat=${lat}&lon=${lon}&appid=${window.API_KEY}&units=imperial`
+  );
 }
 
 async function getFiveDayForecastCoordinates(lat, lon) {
-  return $.ajax({
-    url: `${window.FIVE_DAY_API_URL}?lat=${lat}&lon=${lon}&appid=${window.API_KEY}&units=imperial`,
-    method: "GET",
-    dataType: "json",
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    console.log("Error:", textStatus, errorThrown);
-  });
+  return await fetchData(
+    `${window.FIVE_DAY_API_URL}?lat=${lat}&lon=${lon}&appid=${window.API_KEY}&units=imperial`
+  );
 }
 
-async function getCurrentWeather(cityName) {
-  return $.ajax({
-    url: `${window.CURRENT_DAY_API_URL}?q=${cityName}&appid=${window.API_KEY}&units=imperial`,
-    method: "GET",
-    dataType: "json",
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    console.log("Error:", textStatus, errorThrown);
-  });
-}
-
-async function getFiveDayForecast(cityName) {
-  return $.ajax({
-    url: `${window.FIVE_DAY_API_URL}?q=${cityName}&appid=${window.API_KEY}&units=imperial`,
-    method: "GET",
-    dataType: "json",
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    console.log("Error:", textStatus, errorThrown);
-  });
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 }
 
 function updateLocalStorage(cityName, stateName) {
@@ -72,63 +104,39 @@ function updateLocalStorage(cityName, stateName) {
   }
 }
 
-async function renderContent(cityName) {
-  let cityObj = await getCityInfo(cityName);
-  let resultIndex = searchResults(cityName, cityObj);
-
-  if (resultIndex !== -1) {
-    let currentWeatherObj = await getCurrentWeatherCoordinates(
-      cityObj[resultIndex].lat,
-      cityObj[resultIndex].lon
-    );
-    let fiveDayForecastObj = await getFiveDayForecastCoordinates(
-      cityObj[resultIndex].lat,
-      cityObj[resultIndex].lon
-    );
-    console.log("Pulling with Coords");
-    createElements(currentWeatherObj, fiveDayForecastObj, cityObj, cityName);
-  } else {
-    let currentWeatherObj = await getCurrentWeather(cityName);
-    let fiveDayForecastObj = await getFiveDayForecast(cityName);
-    console.log("Pulling with City Name");
-    createElements(currentWeatherObj, fiveDayForecastObj, cityObj, cityName);
-  }
-}
-function removeSpecialCharacters(string) {
-  return string.replace(/[^a-zA-Z0-9 ]/g, "").toLowerCase();
+async function renderContent(cityName, stateName) {
+  let foundCityObj = await fuzzySearch(stateName, await getCityInfo(cityName));
+  let currentWeatherObj = await getCurrentWeatherCoordinates(
+    foundCityObj[0].item.lat,
+    foundCityObj[0].item.lon
+  );
+  let fiveDayForecastObj = await getFiveDayForecastCoordinates(
+    foundCityObj[0].item.lat,
+    foundCityObj[0].item.lon
+  );
+  console.log(fiveDayForecastObj)
+  createElements(currentWeatherObj, fiveDayForecastObj, foundCityObj[0].item.name, foundCityObj[0].item.state);
 }
 
-function searchResults(string, array) {
-  let stringArray = removeSpecialCharacters(string).split(" ");
-  let resultIndex = -1;
-
-  for (let i = 0; i < array.length; i++) {
-    if (stringArray.includes(array[i].state.toLowerCase())) {
-      resultIndex = i;
-      break;
-    }
-  }
-  return resultIndex;
+function fuzzySearch(string, array) {
+  const options = {
+    includeScore: true,
+    keys: ["state"],
+  };
+  const fuse = new Fuse(array, options);
+  let result = fuse.search(string);
+  return result;
 }
 
 function createElements(
   currentWeatherObj,
   fiveDayForecastObj,
-  cityObj,
-  cityName
+  cityName,
+  stateName
 ) {
-  let index = searchResults(cityName, cityObj);
-  let city = "";
-  let state = "";
-  if (index === -1) {
-    city = cityName.charAt(0).toUpperCase() + cityName.slice(1);
-  } else {
-    city = cityObj[index].name;
-    state = cityObj[index].state;
-  }
-
+  $(".current-weather").empty();
   $(".current-weather").append(
-    `<h2>${city}, ${state} ${dayjs
+    `<h2>${cityName}, ${stateName} ${dayjs
       .unix(currentWeatherObj.dt)
       .format("MM/DD/YYYY")}
 	<img src="${`http://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img></h2>
@@ -154,7 +162,7 @@ function createElements(
 		  <img src="${`http://openweathermap.org/img/wn/${
         fiveDayForecastObj.list[storedIndexes[i]].weather[0].icon
       }@2x.png`}"></img>
-		  <p>Temperature: ${fiveDayForecastObj.list[storedIndexes[i]].main.temp}°F</p>
+		  <p>High: ${fiveDayForecastObj.list[storedIndexes[i]].main.temp}°F</p>
 		  <p>Wind: ${fiveDayForecastObj.list[storedIndexes[i]].wind.speed}MPH</p>
 		  <p>Humidity: ${fiveDayForecastObj.list[storedIndexes[i]].main.humidity}%</p>`
     );
@@ -162,37 +170,21 @@ function createElements(
 }
 
 $(document).ready(function () {
-  $("#search").on("click", function (event) {
+  const $stateSelect = $("#state");
+  const $cityInput = $("#city-name");
+
+  $.each(stateNames, function (index, stateName) {
+    const $option = $("<option>", { value: stateName, text: stateName });
+    $stateSelect.append($option);
+  });
+
+  $("form").on("submit", function (event) {
     event.preventDefault();
-    $(".current-weather").empty();
-    $(".five-day-forecast").empty();
-    const cityName = $("#city-name").val().toLowerCase();
-    renderContent(cityName);
+    if ($cityInput.val() !== "" && $stateSelect.val() !== "") {
+      const cityName = $cityInput.val();
+      const stateName = $stateSelect.val();
+      renderContent(cityName, stateName);
+    }
   });
 });
 
-async function getCityById(cityId) {
-  return new Promise(function (resolve, reject) {
-    const url = `https://meanbean87.github.io/city-list-API/city.list.min.json`;
-    $.getJSON(url, function (data) {
-      const city = data.find((city) => city.id === cityId);
-      if (city) {
-        resolve(city);
-      } else {
-        reject("City not found");
-      }
-    }).fail(function (jqxhr, textStatus, error) {
-      console.log("Error:", textStatus, error);
-      reject(error);
-    });
-  });
-}
-
-const cityId = 4299276;
-getCityById(cityId)
-  .then(function (city) {
-    console.log(city);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
