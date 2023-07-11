@@ -53,7 +53,7 @@ const stateNames = [
   "Wyoming",
 ];
 
-const apiKey = process.env.OPENWEATHER
+const apiKey = process.env.MY_SECRET_KEY
 console.log (apiKey)
 
 async function getCityInfo(cityName) {
