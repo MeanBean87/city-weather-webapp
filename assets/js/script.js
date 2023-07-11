@@ -1,6 +1,4 @@
 const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Louisville"];
-import.meta.env;
-
 
 const stateNames = [
   "Alabama",
