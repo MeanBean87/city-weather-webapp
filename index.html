@@ -23,36 +23,35 @@
         <div>
             <h1>Chill Billy Weather</h1>
         </div>
-        <div>
-            <form>
-                <div>
-                    <label for="city-name">City</label>
-                    <input id="city-name" type="text" name="city" placeholder="City Name" required>
-                </div>
-                <div>
-                    <label for="state">Select a state</label>
-                    <select name="state" id="state" required>
-                        <option value=""></option>
-                    </select>
-                </div>
-                <div>
-                    <button type="submit">Search</button>
-                </div>
-            </form>
-        </div>
     </header>
     <main class="container">
-        <aside class="col-4 city-search">
-
+        <aside class="city-search">
             </hr>
-            <section id="presets">
+            <div>
+                <form>
+                    <div class= search-field-container>
+                        <label for="city-name">City</label>
+                        <input id="city-name" type="text" name="city" placeholder="City Name" required>
+                    </div>
+                    <div class= search-field-container>
+                        <label for="state">Select a state</label>
+                        <select name="state" id="state" required>
+                            <option value="">Select a state</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button id="submit" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </br>
+            <section id="saved-cities">
             </section>
         </aside>
         <section class="weather container">
             <section class="col-12 current-weather">
             </section>
             <section class="col-12 five-day-forecast">
-                <h3>5-Day Forecast:</h3>
             </section>
         </section>
 

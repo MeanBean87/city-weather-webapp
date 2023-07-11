@@ -55,7 +55,9 @@ const stateNames = [
 
 async function getCityInfo(cityName) {
   return await fetchData(
-    `${window.GEOCODING_API_URL}?q=${encodeURIComponent(cityName)}&limit=20&appid=${window.API_KEY}`
+    `${window.GEOCODING_API_URL}?q=${encodeURIComponent(
+      cityName
+    )}&limit=20&appid=${window.API_KEY}`
   );
 }
 
@@ -106,16 +108,32 @@ function updateLocalStorage(cityName, stateName) {
 
 async function renderContent(cityName, stateName) {
   let foundCityObj = await fuzzySearch(stateName, await getCityInfo(cityName));
-  let currentWeatherObj = await getCurrentWeatherCoordinates(
-    foundCityObj[0].item.lat,
-    foundCityObj[0].item.lon
-  );
-  let fiveDayForecastObj = await getFiveDayForecastCoordinates(
-    foundCityObj[0].item.lat,
-    foundCityObj[0].item.lon
-  );
-  console.log(fiveDayForecastObj)
-  createElements(currentWeatherObj, fiveDayForecastObj, foundCityObj[0].item.name, foundCityObj[0].item.state);
+  if (stateName !== foundCityObj[0].item.state) {
+    $(".current-weather").empty();
+    $(".current-weather").append(
+      `<h2 id="error-text" class="error-text">Could Not Find City</h2>`
+    );
+    $("#forecast-title").text("");
+    return;
+  } else {
+    $(".current-weather").remove("#error-text");
+    $("#forecast-title").text("5-Day Forecast:");
+    let currentWeatherObj = await getCurrentWeatherCoordinates(
+      foundCityObj[0].item.lat,
+      foundCityObj[0].item.lon
+    );
+    let fiveDayForecastObj = await getFiveDayForecastCoordinates(
+      foundCityObj[0].item.lat,
+      foundCityObj[0].item.lon
+    );
+    updateLocalStorage(foundCityObj[0].item.name, foundCityObj[0].item.state);
+    createElements(
+      currentWeatherObj,
+      fiveDayForecastObj,
+      foundCityObj[0].item.name,
+      foundCityObj[0].item.state
+    );
+  }
 }
 
 function fuzzySearch(string, array) {
@@ -136,10 +154,11 @@ function createElements(
 ) {
   $(".current-weather").empty();
   $(".current-weather").append(
-    `<h2>${cityName}, ${stateName} ${dayjs
+    `<h2 class="current-weather-title">Current Weather</h2>
+    <h2 class="city-title">${cityName}, ${stateName} ${dayjs
       .unix(currentWeatherObj.dt)
-      .format("MM/DD/YYYY")}
-	<img src="${`http://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img></h2>
+      .format("MM/DD/YYYY")}</h2>
+      <img src="${`http://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img></h2>
 		<p>Temperature: ${currentWeatherObj.main.temp}°F</p>
 		<p>Wind: ${currentWeatherObj.wind.speed}MPH</p>
 		<p>Humidity: ${currentWeatherObj.main.humidity}%</p>`
@@ -152,6 +171,10 @@ function createElements(
       storedIndexes.push(i);
     }
   }
+
+  $(".five-day-forecast").append(
+    `<h3 id="forecast-title">5-Day Forecast:</h3>`
+  );
 
   for (let i = 0; i < storedIndexes.length; i++) {
     $(".five-day-forecast").append(
@@ -167,24 +190,48 @@ function createElements(
 		  <p>Humidity: ${fiveDayForecastObj.list[storedIndexes[i]].main.humidity}%</p>`
     );
   }
+  makeButtons();
+}
+
+function makeButtons() {
+  const tempStorage = JSON.parse(localStorage.getItem("locations"));
+
+  $("#saved-cities").empty();
+
+  $.each(tempStorage, function (index, location) {
+    const $button = $("<button>", {
+      value: location.state,
+      text: location.city,
+    });
+    $("#saved-cities").append($button);
+  });
+
+  $($("#saved-cities")).on("click", "button", function (event) {
+    const clickedCityName = $(this).text();
+    const clickedStateName = $(this).val();
+    renderContent(clickedCityName, clickedStateName);
+    $(".current-weather").empty();
+    $(".five-day-forecast").empty();
+  });
 }
 
 $(document).ready(function () {
-  const $stateSelect = $("#state");
   const $cityInput = $("#city-name");
+  const $stateSelect = $("#state");
 
   $.each(stateNames, function (index, stateName) {
     const $option = $("<option>", { value: stateName, text: stateName });
     $stateSelect.append($option);
   });
 
+  makeButtons();
+
   $("form").on("submit", function (event) {
     event.preventDefault();
     if ($cityInput.val() !== "" && $stateSelect.val() !== "") {
-      const cityName = $cityInput.val();
+      const cityName = $cityInput.val().trim();
       const stateName = $stateSelect.val();
       renderContent(cityName, stateName);
     }
   });
 });
-
