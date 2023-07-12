@@ -58,32 +58,35 @@ const apiKey = "c3a67a6baa2b74fa79ed801bde2fc0a9";
 
 // This function gets the city information from the OpenWeatherMap Geo API
 async function getCityInfo(cityName) {
-  return await fetchData(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
-      cityName
-    )}&limit=20&appid=${apiKey}`
-  );
+  const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+    cityName
+  )}&limit=20&appid=${apiKey}`;
+  $("body").addClass("loading");
+  $("#saved-cities").addClass("disabled");
+  return await fetchData(url);
 }
 
 // This function gets the current weather from the OpenWeatherMap Daily forecast API using longitude and latitude
 async function getCurrentWeatherCoordinates(lat, lon) {
-  return await fetchData(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
-  );
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+  return await fetchData(url);
 }
 
 // This function gets the 5 day forecast from the OpenWeatherMap five day forecast API using longitude and latitude
 async function getFiveDayForecastCoordinates(lat, lon) {
-  return await fetchData(
-    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
-  );
+  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+  $("#saved-cities").removeClass("disabled");
+  $("body").removeClass("loading");
+  resetInputFields();
+  return await fetchData(url);
 }
 
-// Fetch function to get data from OpenWeatherMap API
+// Fetch function to get data from OpenWeatherMap API all of the above functions use this function
 async function fetchData(url) {
   try {
     const response = await fetch(url);
     const data = await response.json();
+    await new Promise((resolve) => setTimeout(resolve, 500));
     return data;
   } catch (error) {
     console.log(error);
@@ -117,6 +120,7 @@ function updateLocalStorage(cityName, stateName) {
       tempStorage.shift();
     }
     localStorage.setItem("locations", JSON.stringify(tempStorage));
+    makeButtons();
   }
 }
 
@@ -166,7 +170,7 @@ function createElements(
         <img src="${`http://openweathermap.org/img/wn/${
           fiveDayForecastObj.list[storedIndexes[i]].weather[0].icon
         }@2x.png`}"></img>
-              <p>High: ${
+              <p>Temperature: ${
                 fiveDayForecastObj.list[storedIndexes[i]].main.temp
               }°F</p>
               <p>Wind: ${
@@ -177,7 +181,6 @@ function createElements(
               }%</p>`
     );
   }
-  makeButtons();
 }
 
 // This function creates the buttons for the saved cities from local storage.
@@ -195,7 +198,7 @@ function makeButtons() {
     $("#saved-cities").append($button);
   });
 
-  $($("#saved-cities")).on("click", "button", function (event) {
+  $($("#saved-cities")).on("mousedown", "button", function (event) {
     const clickedCityName = $(this).text();
     const clickedStateName = $(this).val();
     renderContent(clickedCityName, clickedStateName);
@@ -213,6 +216,14 @@ function fuzzySearch(string, array) {
   const fuse = new Fuse(array, options);
   let result = fuse.search(string);
   return result;
+}
+
+function resetInputFields() {
+  // Assuming your input fields have class "input-field", you can select them using $(".input-field")
+  $(".input-field").each(function () {
+    var placeholder = $(this).attr("placeholder");
+    $(this).val(placeholder);
+  });
 }
 
 // Calls the fetch functions verifies the city exists and is from the correct state
@@ -252,6 +263,14 @@ async function renderContent(cityName, stateName) {
   } catch (error) {
     console.error("An error occurred:", error);
   }
+}
+
+function resetInputFields() {
+  let inputField = $("#city-name");
+  let placeholder = inputField.attr("placeholder");
+  inputField.val(placeholder);
+  let selectElement = $("#state");
+  selectElement.val("");
 }
 
 // Document ready function

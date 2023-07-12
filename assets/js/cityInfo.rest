@@ -1,1 +1,0 @@
-https://api.openweathermap.org/geo/1.0/direct?q=Charlotte&limit=100&appid=c3a67a6baa2b74fa79ed801bde2fc0a9
