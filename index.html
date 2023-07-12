@@ -23,36 +23,30 @@
         <div>
             <h1>Chill Billy Weather</h1>
         </div>
-    </header>
-    <main class="container">
-        <aside class="city-search">
-            </hr>
-            <div>
-                <form>
-                    <div class= search-field-container>
-                        <label for="city-name">City</label>
-                        <input id="city-name" type="text" name="city" placeholder="City Name" required>
-                    </div>
-                    <div class= search-field-container>
-                        <label for="state">Select a state</label>
-                        <select name="state" id="state" required>
-                            <option value="">Select a state</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button id="submit" type="submit">Search</button>
-                    </div>
-                </form>
+        <form>
+            <div class="search-field-container">
+                <input id="city-name" type="text" name="city" placeholder="City Name" required>
+                <select name="state" id="state" required>
+                    <option value="">State</option>
+                </select>
+                <button id="submit" type="submit">Search</button>
             </div>
-        </br>
+        </form>
+    </header>
+    <main>
+        <div>
             <section id="saved-cities">
             </section>
-        </aside>
-        <section class="weather container">
-            <section class="col-12 current-weather">
+
+        </div>
+        <section class="weather">
+            <section class="current-weather">
             </section>
-            <section class="col-12 five-day-forecast">
-            </section>
+            <div class="five-day-forecast-container">
+                <h3 id="forecast-title">5-Day Forecast</h3>
+                <section class="five-day-forecast">
+                </section>
+            </div>
         </section>
 
     </main>
@@ -62,7 +56,6 @@
     <script src="https://code.jquery.com/jquery-3.7.0.js"
         integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="./assets/js/config.js"></script>
     <script src="./assets/js/script.js"></script>
 </body>
 

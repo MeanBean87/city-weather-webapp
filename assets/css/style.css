@@ -1,243 +1,233 @@
-:root{
+:root {
     --dark-blue: #023047;
-    --blue: #219EBC;
-    --light-blue: #8ECAE6;
-    --orange: #FB8500;
-    --yellow: #FFB703;
-    --montserrat: 'Montserrat', sans-serif;
-    --open-sans: 'Open Sans', sans-serif;
-}
-
-/* Global Styles */
-*{
+    --blue: #219ebc;
+    --light-blue: #8ecae6;
+    --orange: #fb8500;
+    --yellow: #ffb703;
+    --montserrat: "Montserrat", sans-serif;
+    --open-sans: "Open Sans", sans-serif;
+  }
+  
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--montserrat);
-}
-
-p, a, span, li, input, textarea, button {
-    font-family: var(--open-sans);
-}
-
-body{
-    background-color: var(--light-blue);
-}
-
-main{
+  }
+  
+  body {
+    font-family: "Montserrat", sans-serif;
+    background-color: var(--blue);
+  }
+  
+  main {
     margin-top: auto;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
     min-height: 100vh;
-}
-
-/* Header Styles */
-header{
+  }
+  
+  header {
     display: flex;
-    align-items: center ;
+    align-items: center;
     justify-content: space-between;
-    background-color: var(--dark-blue);
+    background-color: #2c3e50;
     color: white;
     padding: 10px;
-    border-bottom: 2px solid var(--yellow);
+    border-bottom: 2px solid #f1c40f;
     margin-bottom: auto;
-}
-
-@media (max-width: 768px){
-    header{
-        position: fixed;
-        top: 0;
-        min-width: 100vw;
-        z-index: 1;
-    }
-    header h1 {
-        font-size: 1.25rem;
-        max-width: 50%;
-        padding: 0;
-    }
-
-    main {
-        margin-top: 10vh;
-    }
-    
-}
-
-footer{
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+    padding: 0;
+  }
+  
+  footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-top: 2px solid var(--yellow);
-    background-color: var(--dark-blue);
+    border-top: 2px solid #f1c40f;
+    background-color: #2c3e50;
     color: white;
     padding: 10px;
     margin-top: auto;
-}
-
-footer p{
-    color: var(--yellow);
-    font-family: var(--montserrat);
-}
-
-.errorText {
-    color: red
-}
-
-#saved-cities {
-    display: flex;
-    flex-direction: column;
-    margin: 1rem;
-}
-
-#saved-cities button{
-    background-color: var(--yellow);
-    color: var(--dark-blue);
-    border: 1px solid var(--dark-blue);
-    border-radius: 5px;
-    padding: 5px;
-    margin: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    box-shadow: 0 0 5px var(--dark-blue);
-    width: 90vw;
-}
-
-#saved-cities button:hover{
-    background-color: var(--dark-blue);
-    color: var(--yellow);
-}
-
-#saved-cities button:focus{
-    outline: none;
-}
-
-aside {
+  }
+  
+  form {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-}
-
-#state {
-    font-size: 16px;
-    font-weight: bold;
-    width: 300px;
-    height: 25px;
-    margin-top: .5rem;
-}
-
-#city-name {
-    font-size: 16px;
-    font-weight: bold;
-    width: 300px;
-    height: 25px;
-    text-align: center;
-    margin-top: .5rem;
-}
-
-#label {
-    font-size: 16px;
-    font-weight: bold;
-    width: 175px;
-    height: 25px;
-    padding-top: 16px;
-}
-
-#submit {
-    background-color: var(--dark-blue);
-    color: var(--yellow);
-    border: 1px solid var(--yellow);
-    border-radius: 5px;
-    padding: 5px;
-    margin: 5px;
-    cursor: pointer;
-    box-shadow: 0 0 5px var(--dark-blue);
-    min-width: 300px;
-}
-
-label {
-    font-family: var(--montserrat);
-    margin-top: 1rem;
-}
-
-option {
-    font-family: var(--open-sans);
-    text-align: center;
-}
-
-.search-field-container {
+  }
+  
+  .weather {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+  }
+  
+  .current-weather {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.weather {
-    display: flex;
+    margin: 20px 0px;
+  }
+  
+  .five-day-forecast-container {
+    display: none;
     flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    padding-top: 16px;
-}
-
-.current-weather {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 16px;
-    width: 90%;
-    background-color: var(--orange);
-    border-radius: 5px;
-    border: 1px solid var(--dark-blue);
-    box-shadow: 0 0 5px var(--dark-blue);
-}
-
-.five-day-forecast {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding: 16px;
-    width: 90%;
-    background-color: var(--yellow);
-    border-radius: 5px;
-    border: 1px solid var(--dark-blue);
-    box-shadow: 0 0 5px var(--dark-blue);
-}
-
-#forecast-title {
-    font-size: 24px;
-    font-weight: bold;
-    padding-bottom: 16px;
-}
-
-.current-weather-title {
-    font-size: 24px;
-    font-weight: bold;
-    padding-bottom: 16px;
-}
-
-.city-title {
+    min-width: 40vw;
+    max-width: 90vw;
     font-size: 16px;
-    padding-bottom: 16px;
-}
-
-card{
-    border: 1px solid var(--dark-blue);
-    background-color: var(--orange);
-    border-radius: 5px;
     padding: 10px;
+    background-color: var(--orange);
+    border-radius: 5px;
+    border: 1px solid var(--dark-blue);
     box-shadow: 0 0 5px var(--dark-blue);
-    margin: 16px;
-    width: 60vw;
-}
+  }
+  
+  .five-day-forecast {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .five-day aside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+  }
+  
+  card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1c40f;
+    border: 2px solid black;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 5px;
+    width: 250px;
+  }
+  
+  #forecast-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .current-weather {
+    display: none;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    min-width: 40vw;
+    max-width: 90vw;
+    font-size: 16px;
+    padding: 10px;
+    background-color: var(--orange);
+    border-radius: 5px;
+    border: 1px solid var(--dark-blue);
+    box-shadow: 0 0 5px var(--dark-blue);
+  }
+  
+  .current-weather-title {
+    font-size: 24px;
+    font-weight: bold;
+    padding-bottom: 16px;
+  }
+  
+  .city-title {
+    font-size: 16px;
+    padding-bottom: 16px;
+  }
+  
+  .search-field-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  
+  .search-field-container > * {
+    flex-grow: 1;
+  }
+  
+  #saved-cities {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 1;
+    align-items: stretch;
+    justify-content: center;
+  }
+  
+  #saved-cities button {
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid black;
+    background-color: #f1c40f;
+    flex-basis: 150px;
+    width: 20vw;
+    font-size: 16px;
+    font-family: var(--open-sans);
+    box-shadow: 0 0 5px var(--dark-blue);
+  }
+  
+  #city-name,
+  #state,
+  #submit {
+    flex-shrink: 1;
+    padding: 5px; 
+    font-size: 16px;
+    margin: 2px;
+    font-family: var(--open-sans);
+    box-shadow: 0 0 5px var(--dark-blue);
+  }
+  
+  #city-name {
+    width: auto;
+  }
+  
+  #state {
+    width: auto;
+  }
+  
+  #submit {
+    width: auto;
+    background-color: var(--yellow);
+  }
+    
+  
+  #submit:hover {
+    background-color: var(--orange);
+  }
+  
+  #saved-cities button:hover {
+    background-color: var(--orange);
+  }
+  
+  #city-name:hover {
+    scale: 1.05;
+  }
+  
+  #state:hover {
+    scale: 1.05;
+  }
+  
