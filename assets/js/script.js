@@ -153,6 +153,7 @@ function createElements(
   stateName
 ) {
   $(".current-weather").empty();
+  $(".five-day-forecast").empty();
   $(".current-weather").append(
     `<h2 class="current-weather-title">Current Weather</h2>
     <h2 class="city-title">${cityName}, ${stateName} ${dayjs
@@ -210,8 +211,6 @@ function makeButtons() {
     const clickedCityName = $(this).text();
     const clickedStateName = $(this).val();
     renderContent(clickedCityName, clickedStateName);
-    $(".current-weather").empty();
-    $(".five-day-forecast").empty();
   });
 }
 
