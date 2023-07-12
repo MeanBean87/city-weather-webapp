@@ -54,6 +54,12 @@ const stateNames = [
 
 const apiKey = "c3a67a6baa2b74fa79ed801bde2fc0a9";
 
+let currentWeatherEl = $(".current-weather");
+let fiveDayForecastEl = $(".five-day-forecast");
+let weatherEl = $(".weather");
+let fiveDayForecastContainerEl = $(".five-day-forecast-container");
+let savedCitiesEl = $("#saved-cities");
+
 // Functions to get data objects from OpenWeatherMap API
 
 // This function gets the city information from the OpenWeatherMap Geo API
@@ -133,11 +139,11 @@ function createElements(
 ) {
   // This will clear the current weather and five day forecast elements from the page
   // and then append the current weather.
-  $(".current-weather").empty();
-  $(".five-day-forecast").empty();
-  $(".current-weather").css("display", "flex");
-  $(".five-day-forecast-container").css("display", "flex");
-  $(".current-weather").append(
+  currentWeatherEl.empty();
+  fiveDayForecastEl.empty();
+  currentWeatherEl.css("display", "flex");
+  fiveDayForecastContainerEl.css("display", "flex");
+  currentWeatherEl.append(
     `<h2 class="current-weather-title">Current Weather</h2>
     <h2 class="city-title">${cityName}, ${stateName} ${dayjs
       .unix(currentWeatherObj.dt)
@@ -162,7 +168,7 @@ function createElements(
   // This for loop will append the 5 day forecast cards to the page using the stored indexes
   // from the previous for loop.
   for (let i = 0; i < storedIndexes.length; i++) {
-    $(".five-day-forecast").append(
+    fiveDayForecastEl.append(
       `<card id="day-${[i]}">
       <h3>${dayjs
         .unix(fiveDayForecastObj.list[storedIndexes[i]].dt)
@@ -188,17 +194,17 @@ function createElements(
 function makeButtons() {
   const tempStorage = JSON.parse(localStorage.getItem("locations"));
 
-  $("#saved-cities").empty();
+  $(savedCitiesEl).empty();
 
   $.each(tempStorage, function (index, location) {
     const $button = $("<button>", {
       value: location.state,
       text: location.city,
     });
-    $("#saved-cities").append($button);
+    savedCitiesEl.append($button);
   });
 
-  $($("#saved-cities")).on("mousedown", "button", function (event) {
+  $(savedCitiesEl).on("mousedown", "button", function (event) {
     const clickedCityName = $(this).text();
     const clickedStateName = $(this).val();
     renderContent(clickedCityName, clickedStateName);
@@ -238,12 +244,12 @@ async function renderContent(cityName, stateName) {
     // This if statement will check to see if the city exists in the state
     // and if it does not it will display an error message
     if (foundCityObj.length === 0 || stateName !== foundCityObj[0].item.state) {
-      $(".current-weather").css("display", "none");
-      $(".five-day-forecast-container").css("display", "none");
-      $(".weather").append(`<h2 id="error-text">No results found</h2>`);
+      currentWeatherEl.css("display", "none");
+      fiveDayForecastContainerEl.css("display", "none");
+      weatherEl.append(`<h2 id="error-text">No results found</h2>`);
       return;
     } else {
-      $(".weather").find("#error-text").remove();
+      $(weatherEl).find("#error-text").remove();
       let currentWeatherObj = await getCurrentWeatherCoordinates(
         foundCityObj[0].item.lat,
         foundCityObj[0].item.lon
@@ -267,7 +273,6 @@ async function renderContent(cityName, stateName) {
 
 function resetInputFields() {
   let inputField = $("#city-name");
-  let placeholder = inputField.attr("placeholder");
   inputField.val("");
   let selectElement = $("#state");
   selectElement.val("");
