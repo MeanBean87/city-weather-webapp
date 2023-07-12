@@ -268,15 +268,15 @@ async function renderContent(cityName, stateName) {
 function resetInputFields() {
   let inputField = $("#city-name");
   let placeholder = inputField.attr("placeholder");
-  inputField.val(placeholder);
+  inputField.val("");
   let selectElement = $("#state");
   selectElement.val("");
 }
 
 // Document ready function
 $(document).ready(function () {
-  const $cityInput = $("#city-name");
-  const $stateSelect = $("#state");
+  let $cityInput = $("#city-name");
+  let $stateSelect = $("#state");
 
   // This for loop will populate the state select element with the state names array
   $.each(stateNames, function (index, stateName) {

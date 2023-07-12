@@ -2,7 +2,7 @@
 
 ## Description
 
-This webpage is a City Weather Web App that allows users to quickly and easily retrieve current weather information for any desired location. By entering the name of a city, users can instantly obtain relevant weather data, including temperature, humidity, wind speed, and weather conditions. This was a homework challenge during bootcamp at UCB Ext. [Link to Deployed page](https://meanbean87.github.io/web-password-generator/).
+This webpage is a City Weather Web App that allows users to quickly and easily retrieve current weather information for any desired location. By entering the name of a city, users can instantly obtain relevant weather data, including temperature, humidity, wind speed, and weather conditions. This was a homework challenge during bootcamp at UCB Ext. [Link to Deployed page](https://meanbean87.github.io/city-weather-webapp/).
 
 ![Site Landing Page](./assets/images/city-weather-webapp.png)
 
@@ -84,6 +84,7 @@ city and state for which you want to check the weather.
 5. A button will appear of for the city that was previously searched.
 
 To check the weather for another city, simply repeat steps 2-4.
+
 ## Author Info
 
 Michael Mattingly
