@@ -53,23 +53,26 @@ const stateNames = [
   "Wyoming",
 ];
 
+const apiKey = process.env.MY_SECRET_KEY
+console.log (apiKey)
+
 async function getCityInfo(cityName) {
   return await fetchData(
-    `${window.GEOCODING_API_URL}?q=${encodeURIComponent(
+    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
       cityName
-    )}&limit=20&appid=${window.API_KEY}`
+    )}&limit=20&appid=${apiKey}`
   );
 }
 
 async function getCurrentWeatherCoordinates(lat, lon) {
   return await fetchData(
-    `${window.CURRENT_DAY_API_URL}?lat=${lat}&lon=${lon}&appid=${window.API_KEY}&units=imperial`
+    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
   );
 }
 
 async function getFiveDayForecastCoordinates(lat, lon) {
   return await fetchData(
-    `${window.FIVE_DAY_API_URL}?lat=${lat}&lon=${lon}&appid=${window.API_KEY}&units=imperial`
+    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
   );
 }
 
