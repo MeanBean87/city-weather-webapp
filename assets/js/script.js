@@ -142,7 +142,7 @@ function createElements(
     <h2 class="city-title">${cityName}, ${stateName} ${dayjs
       .unix(currentWeatherObj.dt)
       .format("MM/DD/YYYY")}</h2>
-      <img src="${`http://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img></h2>
+      <img src="${`https://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img></h2>
       <p>Temperature: ${currentWeatherObj.main.temp}°F</p>
       <p>Wind: ${currentWeatherObj.wind.speed}MPH</p>
       <p>Humidity: ${currentWeatherObj.main.humidity}%</p>`
