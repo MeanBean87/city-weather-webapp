@@ -188,7 +188,7 @@ function appendFiveDayForecast(storedIndexes, fiveDayForecastObj) {
           <h3>${dayjs
             .unix(fiveDayForecastObj.list[storedIndexes[i]].dt)
             .format("MM/DD/YYYY")}</h3>
-            <img src="http://openweathermap.org/img/wn/${
+            <img src="https://openweathermap.org/img/wn/${
               fiveDayForecastObj.list[storedIndexes[i]].weather[0].icon
             }.png"></img>
             <p>Temperature: ${
