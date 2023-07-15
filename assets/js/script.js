@@ -58,7 +58,6 @@ const $fiveDayForecastEl = $(".five-day-forecast");
 const $weatherEl = $(".weather");
 const $fiveDayForecastContainerEl = $(".five-day-forecast-container");
 const $savedCitiesEl = $("#saved-cities");
-const $bodyEl = $("body");
 const $cityInput = $("#city-name");
 const $stateSelect = $("#state");
 const $recentSearchTextEl = $(".recent-search-text");
@@ -100,7 +99,7 @@ const fetchData = async (url) => {
 // It also checks to see if the city and state already exist in the local storage
 // and if it does it will not add it again.
 // it will also remove the first item in the array if the array length is greater than 8
-function updateLocalStorage(cityName, stateName) {
+const  updateLocalStorage = (cityName, stateName) => {
   let $tempStorage = JSON.parse(localStorage.getItem("locations"));
 
   if (!Array.isArray($tempStorage)) {
@@ -122,13 +121,13 @@ function updateLocalStorage(cityName, stateName) {
       $tempStorage.shift();
     }
     localStorage.setItem("locations", JSON.stringify($tempStorage));
-    makeButtons();
+    renderSavedCityButtons();
   }
 }
 
 // This will clear the current weather and five day forecast elements from the page
 // and then append the current weather.
-function setElements() {
+const clearAndDisplayCurrentWeather = () => {
   $currentweatherEl.empty();
   $fiveDayForecastEl.empty();
   $currentweatherEl.css("display", "flex");
@@ -137,7 +136,7 @@ function setElements() {
 }
 
 // This function appends the current weather to the page
-function appendCurrentWeather(cityName, stateName, currentWeatherObj) {
+const appendCurrentWeather = (cityName, stateName, currentWeatherObj) => {
   $currentweatherEl.append(`
   <h2 class="current-weather-title">Current Weather</h2>
   <h2 class="city-title">${cityName}, ${stateName} ${dayjs
@@ -153,13 +152,13 @@ function appendCurrentWeather(cityName, stateName, currentWeatherObj) {
 }
 
 // This is the function that creates the elements on the page and appends them to the DOM
-function createElements(
+const createElements = (
   currentWeatherObj,
   fiveDayForecastObj,
   cityName,
   stateName
-) {
-  setElements();
+) => {
+  clearAndDisplayCurrentWeather();
   appendCurrentWeather(cityName, stateName, currentWeatherObj);
   let storedIndexes = findNoonIndexes(fiveDayForecastObj);
   appendFiveDayForecast(storedIndexes, fiveDayForecastObj);
@@ -168,7 +167,7 @@ function createElements(
 // This for loop will find the indexes of the 5 day forecast array that contain the
 // 12:00:00 time stamp and store them in an array. This is done because the API returns
 // 40 objects in the array and we only want the 5 day forecast at noon.
-function findNoonIndexes(array) {
+const findNoonIndexes = (array) => {
   let storedIndexes = [];
 
   for (let i = 0; i < array.list.length; i++) {
@@ -181,7 +180,7 @@ function findNoonIndexes(array) {
 
 // This for loop will append the 5 day forecast cards to the page using the stored indexes
 // from the previous for loop.
-function appendFiveDayForecast(storedIndexes, fiveDayForecastObj) {
+const appendFiveDayForecast = (storedIndexes, fiveDayForecastObj) => {
   for (let i = 0; i < storedIndexes.length; i++) {
     $fiveDayForecastEl.append(
       `<card id="day-${[i]}">
@@ -208,7 +207,7 @@ function appendFiveDayForecast(storedIndexes, fiveDayForecastObj) {
 
 // This function creates the buttons for the saved cities from local storage.
 // It also adds an event listener to each button that will call the renderContent
-function makeButtons() {
+const renderSavedCityButtons = () => {
   const $tempStorage = JSON.parse(localStorage.getItem("locations"));
   $($savedCitiesEl).empty();
   $recentSearchTextEl.text("");
@@ -231,7 +230,7 @@ function makeButtons() {
 // Fuzzy search function from Fuse.js, this checks the objects array for the closest match
 // to the string. In this case it will consume the state name and return the closest matching
 // object from getCityInfo state key value pair.
-function fuzzySearch(string, array) {
+const fuzzySearch = (string, array) => {
   const options = {
     includeScore: true,
     keys: ["state"],
@@ -242,7 +241,7 @@ function fuzzySearch(string, array) {
 }
 
 // This function will reset the input fields to the placeholder text
-function resetInputFields() {
+const resetInputFields = () => {
   $(".input-field").each(function () {
     let placeholder = $(this).attr("placeholder");
     $(this).val(placeholder);
@@ -274,7 +273,7 @@ const fetchWeatherData = async (cityName, stateName, lat, lon) => {
   try {
     const currentWeatherObj = await getCurrentWeatherCoordinates(lat, lon);
     const fiveDayForecastObj = await getFiveDayForecastCoordinates(lat, lon);
-    setElements();
+    clearAndDisplayCurrentWeather();
     appendCurrentWeather(cityName, stateName, currentWeatherObj);
     const storedIndexes = findNoonIndexes(fiveDayForecastObj);
     appendFiveDayForecast(storedIndexes, fiveDayForecastObj);
@@ -308,7 +307,7 @@ $(document).ready(function () {
   });
 
   // This will call the makeButtons function on page load
-  makeButtons();
+  renderSavedCityButtons();
 
   // This event listener will call the renderContent function when the form is submitted
   $("form").on("submit", function (event) {
