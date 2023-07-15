@@ -241,7 +241,7 @@ const fuzzySearch = (string, array) => {
 }
 
 // This function will reset the input fields to the placeholder text
-const resetInputFields = () => {
+function resetInputFields() {
   $(".input-field").each(function () {
     let placeholder = $(this).attr("placeholder");
     $(this).val(placeholder);
