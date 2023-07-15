@@ -241,12 +241,11 @@ const fuzzySearch = (string, array) => {
 }
 
 // This function will reset the input fields to the placeholder text
-function resetInputFields() {
-  $(".input-field").each(function () {
-    let placeholder = $(this).attr("placeholder");
-    $(this).val(placeholder);
-  });
+const resetInputFields = () => {
+  $cityInput.val("");
+  $stateSelect.val($stateSelect.find("option:first").val());
 }
+
 
 // Calls the fetch functions verifies the city exists and is from the correct state
 // and passes the data to the createElements function
@@ -269,7 +268,7 @@ const displayErrorMessage = () => {
 };
 
 // This function calls the fetch functions and passes the data to the createElements function
-const fetchWeatherData = async (cityName, stateName, lat, lon) => {
+async function fetchWeatherData(cityName, stateName, lat, lon) {
   try {
     const currentWeatherObj = await getCurrentWeatherCoordinates(lat, lon);
     const fiveDayForecastObj = await getFiveDayForecastCoordinates(lat, lon);
