@@ -53,67 +53,63 @@ const stateNames = [
 ];
 
 const apiKey = "c3a67a6baa2b74fa79ed801bde2fc0a9";
+const $currentweatherEl = $(".current-weather");
+const $fiveDayForecastEl = $(".five-day-forecast");
+const $weatherEl = $(".weather");
+const $fiveDayForecastContainerEl = $(".five-day-forecast-container");
+const $savedCitiesEl = $("#saved-cities");
+const $bodyEl = $("body");
+const $cityInput = $("#city-name");
+const $stateSelect = $("#state");
+const $recentSearchTextEl = $(".recent-search-text");
 
-let currentWeatherEl = $(".current-weather");
-let fiveDayForecastEl = $(".five-day-forecast");
-let weatherEl = $(".weather");
-let fiveDayForecastContainerEl = $(".five-day-forecast-container");
-let savedCitiesEl = $("#saved-cities");
-
-// Functions to get data objects from OpenWeatherMap API
-
+// These functions store the API URL for each endpoint and then call the fetchData function
 // This function gets the city information from the OpenWeatherMap Geo API
-async function getCityInfo(cityName) {
+const getCityInfo = async (cityName) => {
   const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
     cityName
   )}&limit=20&appid=${apiKey}`;
-  $("body").addClass("loading");
-  $("#saved-cities").addClass("disabled");
   return await fetchData(url);
-}
+};
 
 // This function gets the current weather from the OpenWeatherMap Daily forecast API using longitude and latitude
-async function getCurrentWeatherCoordinates(lat, lon) {
+const getCurrentWeatherCoordinates = async (lat, lon) => {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
   return await fetchData(url);
-}
+};
 
 // This function gets the 5 day forecast from the OpenWeatherMap five day forecast API using longitude and latitude
-async function getFiveDayForecastCoordinates(lat, lon) {
+const getFiveDayForecastCoordinates = async (lat, lon) => {
   const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
-  $("#saved-cities").removeClass("disabled");
-  $("body").removeClass("loading");
-  resetInputFields();
   return await fetchData(url);
-}
+};
 
 // Fetch function to get data from OpenWeatherMap API all of the above functions use this function
-async function fetchData(url) {
+const fetchData = async (url) => {
   try {
     const response = await fetch(url);
     const data = await response.json();
-    await new Promise((resolve) => setTimeout(resolve, 500));
     return data;
   } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 // This function updates the local storage with the city and state name
 // It also checks to see if the city and state already exist in the local storage
 // and if it does it will not add it again.
 // it will also remove the first item in the array if the array length is greater than 8
 function updateLocalStorage(cityName, stateName) {
-  let tempStorage = JSON.parse(localStorage.getItem("locations"));
+  let $tempStorage = JSON.parse(localStorage.getItem("locations"));
 
-  if (!Array.isArray(tempStorage)) {
-    tempStorage = [];
+  if (!Array.isArray($tempStorage)) {
+    $tempStorage = [];
   }
 
   let locationExists = false;
 
-  for (const location of tempStorage) {
+  for (const location of $tempStorage) {
     if (location.city === cityName && location.state === stateName) {
       locationExists = true;
       break;
@@ -121,13 +117,39 @@ function updateLocalStorage(cityName, stateName) {
   }
 
   if (!locationExists) {
-    tempStorage.push({ city: cityName, state: stateName });
-    if (tempStorage.length > 8) {
-      tempStorage.shift();
+    $tempStorage.push({ city: cityName, state: stateName });
+    if ($tempStorage.length > 8) {
+      $tempStorage.shift();
     }
-    localStorage.setItem("locations", JSON.stringify(tempStorage));
+    localStorage.setItem("locations", JSON.stringify($tempStorage));
     makeButtons();
   }
+}
+
+// This will clear the current weather and five day forecast elements from the page
+// and then append the current weather.
+function setElements() {
+  $currentweatherEl.empty();
+  $fiveDayForecastEl.empty();
+  $currentweatherEl.css("display", "flex");
+  $fiveDayForecastContainerEl.css("display", "flex");
+  resetInputFields();
+}
+
+// This function appends the current weather to the page
+function appendCurrentWeather(cityName, stateName, currentWeatherObj) {
+  $currentweatherEl.append(`
+  <h2 class="current-weather-title">Current Weather</h2>
+  <h2 class="city-title">${cityName}, ${stateName} ${dayjs
+    .unix(currentWeatherObj.dt)
+    .format("MM/DD/YYYY")}</h2>
+    <img src="https://openweathermap.org/img/wn/${
+      currentWeatherObj.weather[0].icon
+    }.png"></img>
+    <p>Temperature: ${currentWeatherObj.main.temp}°F</p>
+    <p>Wind: ${currentWeatherObj.wind.speed}MPH</p>
+    <p>Humidity: ${currentWeatherObj.main.humidity}%</p>
+    `);
 }
 
 // This is the function that creates the elements on the page and appends them to the DOM
@@ -137,54 +159,49 @@ function createElements(
   cityName,
   stateName
 ) {
-  // This will clear the current weather and five day forecast elements from the page
-  // and then append the current weather.
-  currentWeatherEl.empty();
-  fiveDayForecastEl.empty();
-  currentWeatherEl.css("display", "flex");
-  fiveDayForecastContainerEl.css("display", "flex");
-  currentWeatherEl.append(
-    `<h2 class="current-weather-title">Current Weather</h2>
-    <h2 class="city-title">${cityName}, ${stateName} ${dayjs
-      .unix(currentWeatherObj.dt)
-      .format("MM/DD/YYYY")}</h2>
-      <img src="${`https://openweathermap.org/img/wn/${currentWeatherObj.weather[0].icon}@2x.png`}"></img></h2>
-      <p>Temperature: ${currentWeatherObj.main.temp}°F</p>
-      <p>Wind: ${currentWeatherObj.wind.speed}MPH</p>
-      <p>Humidity: ${currentWeatherObj.main.humidity}%</p>`
-  );
+  setElements();
+  appendCurrentWeather(cityName, stateName, currentWeatherObj);
+  let storedIndexes = findNoonIndexes(fiveDayForecastObj);
+  appendFiveDayForecast(storedIndexes, fiveDayForecastObj);
+}
 
-  // This for loop will find the indexes of the 5 day forecast array that contain the
-  // 12:00:00 time stamp and store them in an array. This is done because the API returns
-  // 40 objects in the array and we only want the 5 day forecast at noon.
+// This for loop will find the indexes of the 5 day forecast array that contain the
+// 12:00:00 time stamp and store them in an array. This is done because the API returns
+// 40 objects in the array and we only want the 5 day forecast at noon.
+function findNoonIndexes(array) {
   let storedIndexes = [];
 
-  for (let i = 0; i < fiveDayForecastObj.list.length; i++) {
-    if (fiveDayForecastObj.list[i].dt_txt.includes("12:00:00")) {
+  for (let i = 0; i < array.list.length; i++) {
+    if (array.list[i].dt_txt.includes("12:00:00")) {
       storedIndexes.push(i);
     }
   }
+  return storedIndexes;
+}
 
-  // This for loop will append the 5 day forecast cards to the page using the stored indexes
-  // from the previous for loop.
+// This for loop will append the 5 day forecast cards to the page using the stored indexes
+// from the previous for loop.
+function appendFiveDayForecast(storedIndexes, fiveDayForecastObj) {
   for (let i = 0; i < storedIndexes.length; i++) {
-    fiveDayForecastEl.append(
+    $fiveDayForecastEl.append(
       `<card id="day-${[i]}">
-      <h3>${dayjs
-        .unix(fiveDayForecastObj.list[storedIndexes[i]].dt)
-        .format("MM/DD/YYYY")}</h3>
-        <img src="${`http://openweathermap.org/img/wn/${
-          fiveDayForecastObj.list[storedIndexes[i]].weather[0].icon
-        }@2x.png`}"></img>
-              <p>Temperature: ${
-                fiveDayForecastObj.list[storedIndexes[i]].main.temp
-              }°F</p>
-              <p>Wind: ${
-                fiveDayForecastObj.list[storedIndexes[i]].wind.speed
-              }MPH</p>
-              <p>Humidity: ${
-                fiveDayForecastObj.list[storedIndexes[i]].main.humidity
-              }%</p>`
+          <h3>${dayjs
+            .unix(fiveDayForecastObj.list[storedIndexes[i]].dt)
+            .format("MM/DD/YYYY")}</h3>
+            <img src="http://openweathermap.org/img/wn/${
+              fiveDayForecastObj.list[storedIndexes[i]].weather[0].icon
+            }.png"></img>
+            <p>Temperature: ${
+              fiveDayForecastObj.list[storedIndexes[i]].main.temp
+            }°F</p>
+            <p>Wind: ${
+              fiveDayForecastObj.list[storedIndexes[i]].wind.speed
+            }MPH</p>
+            <p>Humidity: ${
+              fiveDayForecastObj.list[storedIndexes[i]].main.humidity
+            }%</p>
+            </card>
+            `
     );
   }
 }
@@ -192,19 +209,19 @@ function createElements(
 // This function creates the buttons for the saved cities from local storage.
 // It also adds an event listener to each button that will call the renderContent
 function makeButtons() {
-  const tempStorage = JSON.parse(localStorage.getItem("locations"));
-
-  $(savedCitiesEl).empty();
-
-  $.each(tempStorage, function (index, location) {
+  const $tempStorage = JSON.parse(localStorage.getItem("locations"));
+  $($savedCitiesEl).empty();
+  $recentSearchTextEl.text("");
+  $.each($tempStorage, function (index, location) {
     const $button = $("<button>", {
       value: location.state,
       text: location.city,
     });
-    savedCitiesEl.append($button);
+    $savedCitiesEl.append($button);
+    $recentSearchTextEl.text("Recent Searches");
   });
 
-  $(savedCitiesEl).on("mousedown", "button", function (event) {
+  $($savedCitiesEl).on("mousedown", "button", function (event) {
     const clickedCityName = $(this).text();
     const clickedStateName = $(this).val();
     renderContent(clickedCityName, clickedStateName);
@@ -224,65 +241,66 @@ function fuzzySearch(string, array) {
   return result;
 }
 
+// This function will reset the input fields to the placeholder text
 function resetInputFields() {
-  // Assuming your input fields have class "input-field", you can select them using $(".input-field")
   $(".input-field").each(function () {
-    var placeholder = $(this).attr("placeholder");
+    let placeholder = $(this).attr("placeholder");
     $(this).val(placeholder);
   });
 }
 
 // Calls the fetch functions verifies the city exists and is from the correct state
 // and passes the data to the createElements function
-async function renderContent(cityName, stateName) {
+const validateCityAndState = (stateName, foundCityObj) => {
+  if (foundCityObj.length === 0 || stateName !== foundCityObj[0].item.state) {
+    displayErrorMessage();
+  } else {
+    const { name, state, lat, lon } = foundCityObj[0].item;
+    updateLocalStorage(name, state);
+    fetchWeatherData(name, state, lat, lon);
+  }
+};
+
+//Shows error message if city is not found
+const displayErrorMessage = () => {
+  $currentweatherEl.css("display", "none");
+  $fiveDayForecastContainerEl.css("display", "none");
+  $weatherEl.append(`<h2 id="error-text">No results found</h2>`);
+  $savedCitiesEl.removeClass("disabled");
+};
+
+// This function calls the fetch functions and passes the data to the createElements function
+const fetchWeatherData = async (cityName, stateName, lat, lon) => {
   try {
-    let foundCityObj = await fuzzySearch(
+    const currentWeatherObj = await getCurrentWeatherCoordinates(lat, lon);
+    const fiveDayForecastObj = await getFiveDayForecastCoordinates(lat, lon);
+    setElements();
+    appendCurrentWeather(cityName, stateName, currentWeatherObj);
+    const storedIndexes = findNoonIndexes(fiveDayForecastObj);
+    appendFiveDayForecast(storedIndexes, fiveDayForecastObj);
+  } catch (error) {
+    console.error("An error occurred:", error);
+  } finally {
+    $savedCitiesEl.removeClass("disabled");
+  }
+};
+
+// This function calls the fuzzy search function and then calls the validateCityAndState function
+const renderContent = async (cityName, stateName) => {
+  $savedCitiesEl.addClass("disabled");
+  try {
+    const foundCityObj = await fuzzySearch(
       stateName,
       await getCityInfo(cityName)
     );
-
-    // This if statement will check to see if the city exists in the state
-    // and if it does not it will display an error message
-    if (foundCityObj.length === 0 || stateName !== foundCityObj[0].item.state) {
-      currentWeatherEl.css("display", "none");
-      fiveDayForecastContainerEl.css("display", "none");
-      weatherEl.append(`<h2 id="error-text">No results found</h2>`);
-      return;
-    } else {
-      $(weatherEl).find("#error-text").remove();
-      let currentWeatherObj = await getCurrentWeatherCoordinates(
-        foundCityObj[0].item.lat,
-        foundCityObj[0].item.lon
-      );
-      let fiveDayForecastObj = await getFiveDayForecastCoordinates(
-        foundCityObj[0].item.lat,
-        foundCityObj[0].item.lon
-      );
-      updateLocalStorage(foundCityObj[0].item.name, foundCityObj[0].item.state);
-      createElements(
-        currentWeatherObj,
-        fiveDayForecastObj,
-        foundCityObj[0].item.name,
-        foundCityObj[0].item.state
-      );
-    }
+    validateCityAndState(stateName, foundCityObj);
   } catch (error) {
     console.error("An error occurred:", error);
   }
-}
-
-function resetInputFields() {
-  let inputField = $("#city-name");
-  inputField.val("");
-  let selectElement = $("#state");
-  selectElement.val("");
-}
+};
 
 // Document ready function
 $(document).ready(function () {
-  let $cityInput = $("#city-name");
-  let $stateSelect = $("#state");
-
   // This for loop will populate the state select element with the state names array
   $.each(stateNames, function (index, stateName) {
     const $option = $("<option>", { value: stateName, text: stateName });

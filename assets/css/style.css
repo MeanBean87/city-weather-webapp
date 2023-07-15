@@ -99,18 +99,6 @@ form {
 }
 
 
-#city-name:hover {
-  scale: 1.05;
-}
-
-#state:hover {
-  scale: 1.05;
-}
-
-.loading {
-  cursor: wait !important;
-}
-
 .disabled {
   pointer-events: none;
 }
@@ -125,6 +113,14 @@ form {
   justify-content: center;
 }
 
+.recent-searches {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
 #saved-cities button {
   margin: 5px;
   padding: 5px;
@@ -132,14 +128,38 @@ form {
   border: 1px solid black;
   background-color: #f1c40f;
   flex-basis: 150px;
-  width: 20vw;
+  min-width: 25vw;
   font-size: 16px;
   font-family: var(--montserrat);
   box-shadow: 0 0 5px var(--dark-blue);
 }
 
-#saved-cities button:hover {
-  background-color: var(--orange);
+@media (hover: hover) {
+  #saved-cities button:hover {
+    background-color: var(--orange);
+  }
+  
+  #city-name:hover {
+    scale: 1.05;
+  }
+  
+  #state:hover {
+    scale: 1.05;
+  }
+}
+
+@media (hover: none) {
+  #saved-cities button:active {
+    background-color: var(--yellow);
+  }
+
+  #city-name:active {
+    scale: 1.05;
+  }
+  
+  #state:active {
+    scale: 1.05;
+  }
 }
 
 /* Weather Styles */
@@ -230,7 +250,6 @@ card {
   box-shadow: 0 0 5px var(--dark-blue);
 }
 
-
 /* Footer Styles */
 footer {
   display: flex;
@@ -242,15 +261,3 @@ footer {
   padding: 10px;
   margin-top: auto;
 }
-
-
-
-
-
-
-
-
-
-
-
-
